@@ -9,7 +9,7 @@ Visit the main page: [https://saklain-mustaque.github.io/Learning-Web-Dev/](http
 ### Individual Apps:
 - [Background Changer](https://saklain-mustaque.github.io/Learning-Web-Dev/React/background-changer/) - Interactive background color changer
 - [GitHub Card](https://saklain-mustaque.github.io/Learning-Web-Dev/React/github-card/) - GitHub profile card component
-- [Paragraph Generator](https://saklain-mustaque.github.io/Learning-Web-Dev/React/para-generator/) - Lorem ipsum generator
+- [Paragraph Generator](https://saklain-mustaque.github.io/Learning-Web-Dev/React/para-generator/) - Paragraph generator based on given word counts(Text Generated using AI)
 - [Profile Card Component](https://saklain-mustaque.github.io/Learning-Web-Dev/React/Profile-Card-Component/) - Elegant profile card
 
 ## 📁 Project Structure
