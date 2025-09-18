@@ -1,0 +1,170 @@
+name: Deploy React Apps to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'React/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'React/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          React/background-changer/package-lock.json
+          React/github-card/package-lock.json
+          React/para-generator/package-lock.json
+          React/Profile-Card-Component/package-lock.json
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Create main index.html
+      run: |
+        mkdir -p public
+        cat > public/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Learning Web Dev - React Apps</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 2rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    color: white;
+                }
+                .container {
+                    background: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(10px);
+                    border-radius: 20px;
+                    padding: 2rem;
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                }
+                h1 { text-align: center; margin-bottom: 2rem; }
+                .apps-grid {
+                    display: grid;
+                    gap: 1rem;
+                    margin-top: 2rem;
+                }
+                .app-card {
+                    background: rgba(255, 255, 255, 0.2);
+                    padding: 1.5rem;
+                    border-radius: 15px;
+                    text-decoration: none;
+                    color: white;
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
+                .app-card:hover {
+                    transform: translateY(-5px);
+                    background: rgba(255, 255, 255, 0.3);
+                    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+                }
+                .app-name { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; }
+                .app-desc { opacity: 0.9; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>🚀 React Learning Projects</h1>
+                <p style="text-align: center; opacity: 0.9;">Collection of React applications built while learning</p>
+                
+                <div class="apps-grid">
+                    <a href="./React/background-changer/" class="app-card">
+                        <div class="app-name">Background Changer</div>
+                        <div class="app-desc">Interactive background color changer with React</div>
+                    </a>
+                    
+                    <a href="./React/github-card/" class="app-card">
+                        <div class="app-name">GitHub Card</div>
+                        <div class="app-desc">GitHub profile card component with Tailwind CSS</div>
+                    </a>
+                    
+                    <a href="./React/para-generator/" class="app-card">
+                        <div class="app-name">Paragraph Generator</div>
+                        <div class="app-desc">Lorem ipsum paragraph generator tool</div>
+                    </a>
+                    
+                    <a href="./React/Profile-Card-Component/" class="app-card">
+                        <div class="app-name">Profile Card Component</div>
+                        <div class="app-desc">Elegant profile card with modern styling</div>
+                    </a>
+                </div>
+                
+                <footer style="text-align: center; margin-top: 2rem; opacity: 0.7;">
+                    <p>Built with ❤️ using React & Vite</p>
+                </footer>
+            </div>
+        </body>
+        </html>
+        EOF
+    
+    # Build each React app
+    - name: Build Background Changer
+      run: |
+        cd React/background-changer
+        npm ci
+        npm run build
+        
+    - name: Build GitHub Card
+      run: |
+        cd React/github-card
+        npm ci
+        npm run build
+        
+    - name: Build Para Generator
+      run: |
+        cd React/para-generator
+        npm ci
+        npm run build
+        
+    - name: Build Profile Card Component
+      run: |
+        cd React/Profile-Card-Component
+        npm ci
+        npm run build
+    
+    # Copy built files to public directory
+    - name: Copy built files
+      run: |
+        cp -r React/background-changer/dist public/React/background-changer
+        cp -r React/github-card/dist public/React/github-card
+        cp -r React/para-generator/dist public/React/para-generator
+        cp -r React/Profile-Card-Component/dist public/React/Profile-Card-Component
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./public
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
